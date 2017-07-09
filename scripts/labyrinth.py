@@ -45,12 +45,15 @@ class Labyrinth(object):
         error = 0.
 
         #checking if out of bound
-        if position[0]<0 or position[1]<0:
-            return -np.min(position[0],position[1])
-        else if position[2]>2:
-            return position[0]
-        else if position[3]>2:
-            return position[1]
+        if field[0]<0 or field[1]<0:
+#            print  "negative", self.labyrinth_array[field[2]*2+1,field[3]*2+1], [field[2]*2+1+check[0],field[3]*2+1]
+            return -np.min(field[0:2])
+        elif field[2]>2:
+#            print  "index", field
+            return field[0]
+        elif field[3]>2:
+#            print  "index", field
+            return field[1]
 
         #at what corner of the field is the robot
         if field[0]>self.size/2:
@@ -58,25 +61,32 @@ class Labyrinth(object):
             check[0]+=2
         if field[1]>self.size/2:
             field[1] = self.size-field[1]
-            check[0]+=2
+            check[1]+=2
+
         if field[0]>field[1]:
             #is there a wall?
-            if self.labyrinth_array[field[2]*2+check[0],field[3]*2+1+check[1]] == -1:
+            if self.labyrinth_array[field[2]*2+1,field[3]*2+1+check[1]] == -1:
+#                print "y taken", field, self.labyrinth_array[field[2]*2+1,field[3]*2+1], [field[2]*2+1,field[3]*2+1+check[1]]
                 error = field[1]
             else:
                 #if not, check surrounding later
+#                print "checked", field, self.labyrinth_array[field[2]*2+1,field[3]*2+1]
                 check_near=True
-        else if self.labyrinth_array[field[2]*2+1+check[0],field[3]*2+check[1]] == -1:
+        elif self.labyrinth_array[field[2]*2+1+check[0],field[3]*2+1] == -1:
+#            print  "x taken",field, self.labyrinth_array[field[2]*2+1,field[3]*2+1], [field[2]*2+1+check[0],field[3]*2+1]
             error = field[0]
         else:
+#            print "checked", field, self.labyrinth_array[field[2]*2+1,field[3]*2+1]
             check_near = True
 
         if check_near:
+            return np.linalg.norm(field[0:2],2)
 
         return error
 
     def get_field_and_coords(self, position):
-        res = [position[0][0],position[0][1],0,0] #pos_x, pos_y, field_x,field_y
+        #print position[0]
+        res = [position[0],position[1],0,0] #pos_x, pos_y, field_x,field_y
         while res[0] > self.size:
             res[0]-=self.size
             res[2]+=1
